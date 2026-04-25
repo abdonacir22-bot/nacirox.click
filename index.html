@@ -3,278 +3,736 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ncrrxx</title>
+    <title>Gems Pro - Premium System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
-        body { font-family: 'Cairo', sans-serif; background-color: #020617; overflow-x: hidden; }
+        :root {
+            --gold: #f59e0b;
+            --gold-bright: #fbbf24;
+            --gold-dim: #d97706;
+            --bg-deep: #020617;
+            --bg-dark: #0a0f1e;
+            --bg-card: #0d1526;
+            --bg-card2: #111827;
+            --border: #1e293b;
+            --border-glow: rgba(245,158,11,0.25);
+            --text-muted: #64748b;
+        }
+
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: var(--bg-deep); 
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(245,158,11,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 30% at 90% 80%, rgba(59,130,246,0.04) 0%, transparent 50%);
+        }
         .hidden { display: none; }
-        .sidebar { transition: transform 0.4s ease-in-out; z-index: 100; }
-        .profile-overlay { backdrop-filter: blur(12px); background: rgba(0,0,0,0.8); }
+
+        /* ── SIDEBAR ── */
+        .sidebar { 
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1); 
+            z-index: 100; 
+        }
+
+        /* ── OVERLAY ── */
+        .profile-overlay { 
+            backdrop-filter: blur(16px) saturate(120%); 
+            background: rgba(2,6,23,0.85); 
+        }
+
+        /* ── TICKER ── */
         @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
         .admin-ticker { animation: ticker 20s linear infinite; white-space: nowrap; }
-        .notif-badge { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: red; border-radius: 50%; border: 2px solid #000; }
-        
+
+        /* ── NOTIF BADGE ── */
+        .notif-badge { 
+            position: absolute; top: -2px; right: -2px; 
+            width: 10px; height: 10px; 
+            background: #ef4444; border-radius: 50%; 
+            border: 2px solid #000; 
+            box-shadow: 0 0 6px rgba(239,68,68,0.8);
+        }
+
+        /* ── TOP POPUP ── */
         #top-popup-notif { 
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%); 
-            z-index: 1000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s, transform 0.3s; 
-            width: 90%; max-width: 400px; cursor: grab; touch-action: none;
+            z-index: 1000; 
+            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s, transform 0.3s; 
+            width: 90%; max-width: 420px; cursor: grab; touch-action: none;
         }
         #top-popup-notif.show { top: 20px; }
-        
-        .prize-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 1.5rem; padding: 1rem; text-align: center; transition: all 0.3s; }
-        .prize-card:hover { border-color: #eab308; transform: translateY(-5px); }
-        .prize-img { width: 100%; height: 80px; object-fit: contain; margin-bottom: 0.5rem; }
-        
-        .points-bump { animation: pointsBump 0.5s ease-out; color: #fbbf24 !important; text-shadow: 0 0 20px #fbbf24; }
+
+        /* ── PRIZE CARDS ── */
+        .prize-card { 
+            background: linear-gradient(135deg, #0d1526 0%, #111827 100%); 
+            border: 1px solid var(--border); 
+            border-radius: 1.5rem; 
+            padding: 1.2rem; 
+            text-align: center; 
+            transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1); 
+            position: relative;
+            overflow: hidden;
+        }
+        .prize-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(245,158,11,0.04) 100%);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .prize-card:hover { 
+            border-color: var(--gold); 
+            transform: translateY(-6px); 
+            box-shadow: 0 20px 40px -12px rgba(245,158,11,0.2);
+        }
+        .prize-card:hover::before { opacity: 1; }
+        .prize-img { width: 100%; height: 80px; object-fit: contain; margin-bottom: 0.75rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
+
+        /* ── POINTS BUMP ── */
+        .points-bump { animation: pointsBump 0.5s ease-out; color: var(--gold-bright) !important; text-shadow: 0 0 30px var(--gold-bright), 0 0 60px rgba(251,191,36,0.4); }
         @keyframes pointsBump { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
+        /* ── CLOSE BUTTON ── */
         .btn-close-custom { 
             position: absolute; top: 1.5rem; left: 1.5rem; 
-            width: 35px; height: 35px; background: #ef4444; 
-            color: white; border-radius: 50%; display: flex; 
-            align-items: center; justify-content: center; 
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-            cursor: pointer; z-index: 10; transition: transform 0.2s;
-            border: none; outline: none;
+            width: 36px; height: 36px; 
+            background: rgba(239,68,68,0.15); 
+            color: #ef4444; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            border: 1px solid rgba(239,68,68,0.3);
+            cursor: pointer; z-index: 10; 
+            transition: all 0.2s;
+            outline: none;
         }
+        .btn-close-custom:hover { background: #ef4444; color: white; box-shadow: 0 4px 20px rgba(239,68,68,0.4); }
         .btn-close-custom:active { transform: scale(0.9); }
+
+        /* ── NAV BAR GLOW ── */
+        .nav-bar {
+            background: rgba(10,15,30,0.85);
+            backdrop-filter: blur(20px) saturate(150%);
+            border-bottom: 1px solid rgba(245,158,11,0.12);
+        }
+
+        /* ── POINTS COUNTER PILL ── */
+        .points-pill {
+            background: linear-gradient(135deg, #0d1526, #111827);
+            border: 1px solid rgba(245,158,11,0.3);
+            box-shadow: 0 0 20px -5px rgba(245,158,11,0.2), inset 0 1px 0 rgba(245,158,11,0.1);
+        }
+
+        /* ── TASK CARDS ── */
+        .task-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 1.25rem;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative; overflow: hidden;
+        }
+        .task-card::after {
+            content: '';
+            position: absolute; left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--gold), transparent);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .task-card:hover { 
+            border-color: rgba(245,158,11,0.5); 
+            transform: translateX(-4px);
+            box-shadow: 0 8px 32px -8px rgba(245,158,11,0.15);
+        }
+        .task-card:hover::after { opacity: 1; }
+
+        /* ── REWARD BADGE ── */
+        .reward-badge {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+            box-shadow: 0 4px 12px rgba(245,158,11,0.35);
+        }
+
+        /* ── SECTION HEADER ── */
+        .section-header {
+            font-size: 1.1rem; font-weight: 900;
+            color: white;
+            display: flex; align-items: center; gap: 0.6rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+        .section-header::after {
+            content: '';
+            position: absolute; bottom: -1px; right: 0;
+            width: 60px; height: 2px;
+            background: linear-gradient(to left, var(--gold), transparent);
+        }
+
+        /* ── SIDEBAR ITEMS ── */
+        .sidebar-item {
+            background: linear-gradient(135deg, #0d1526, #111827);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 1.1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            display: flex; align-items: center; gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .sidebar-item:hover { 
+            border-color: rgba(245,158,11,0.4); 
+            background: linear-gradient(135deg, #111827, #1a2540);
+        }
+
+        /* ── MODAL CARDS ── */
+        .modal-card {
+            background: linear-gradient(145deg, #0a0f1e, #0d1526);
+            border: 1px solid rgba(245,158,11,0.12);
+            box-shadow: 0 40px 80px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.03);
+        }
+
+        /* ── ADMIN CARDS ── */
+        .admin-section {
+            background: linear-gradient(135deg, #0d1526, #111827);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .admin-stat-box {
+            background: linear-gradient(135deg, #0a0f1e, #111827);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        /* ── INPUT FIELDS ── */
+        .form-input {
+            width: 100%;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
+            color: white;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: 'Cairo', sans-serif;
+        }
+        .form-input:focus {
+            border-color: rgba(245,158,11,0.5);
+            box-shadow: 0 0 0 3px rgba(245,158,11,0.08);
+        }
+        .form-input::placeholder { color: var(--text-muted); }
+
+        /* ── BUTTONS ── */
+        .btn-primary {
+            width: 100%; 
+            background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+            color: black; font-weight: 900;
+            padding: 1rem; border-radius: 1rem;
+            border: none; cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 24px -6px rgba(245,158,11,0.4);
+            font-family: 'Cairo', sans-serif;
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 12px 32px -6px rgba(245,158,11,0.5);
+        }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-secondary {
+            width: 100%; 
+            background: rgba(255,255,255,0.06);
+            color: white; font-weight: 700;
+            padding: 1rem; border-radius: 1rem;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Cairo', sans-serif;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+        /* ── LOGIN PAGE ── */
+        .login-logo {
+            width: 7rem; height: 7rem;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+            border-radius: 2.5rem;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 20px 50px -10px rgba(245,158,11,0.5), 0 0 0 1px rgba(245,158,11,0.3);
+            overflow: hidden;
+        }
+
+        .google-btn {
+            display: flex; align-items: center; gap: 1rem;
+            background: white; color: #111;
+            padding: 1rem 2.5rem;
+            border-radius: 1.5rem;
+            font-weight: 900;
+            border: none; cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            font-family: 'Cairo', sans-serif;
+        }
+        .google-btn:hover { transform: scale(1.04); box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(245,158,11,0.4); }
+
+        /* ── SHIMMER for proof upload ── */
+        .upload-zone {
+            background: rgba(255,255,255,0.03);
+            border: 2px dashed var(--border);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .upload-zone:hover { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.04); }
+
+        /* ── NOTIFICATION ITEM ── */
+        .notif-item {
+            background: linear-gradient(135deg, rgba(245,158,11,0.06), transparent);
+            border-right: 3px solid var(--gold);
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ── WITHDRAW HISTORY ITEM ── */
+        .withdraw-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0.875rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ── PROFILE STATS ── */
+        .profile-stat {
+            background: linear-gradient(135deg, rgba(245,158,11,0.06), transparent);
+            border: 1px solid rgba(245,158,11,0.15);
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+        }
+
+        /* ── REFERRAL CARD ── */
+        .referral-code-box {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 2rem;
+            padding: 1rem;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #0369a1;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.2em;
+            text-align: center;
+            margin-bottom: 1rem;
+            border: 2px solid rgba(3,105,161,0.2);
+        }
+
+        /* ── FADE IN ANIMATION ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeInUp 0.4s ease-out forwards; }
+
+        /* ── GLOW PULSE for gem icon ── */
+        @keyframes gemGlow {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(245,158,11,0.6)); }
+            50% { filter: drop-shadow(0 0 12px rgba(245,158,11,1)); }
+        }
+        .gem-glow { animation: gemGlow 2s ease-in-out infinite; }
     </style>
 </head>
 <body class="text-white">
 
-    <div id="top-popup-notif" class="bg-yellow-500 text-black p-4 rounded-2xl shadow-2xl font-bold flex items-center gap-3">
-        <i class="fas fa-bell animate-bounce"></i>
-        <span id="popup-text"></span>
+    <!-- ══ TOP POPUP NOTIFICATION ══ -->
+    <div id="top-popup-notif" class="bg-gradient-to-r from-yellow-500 to-amber-400 text-black p-4 rounded-2xl shadow-2xl font-bold flex items-center gap-3" style="box-shadow: 0 20px 60px -10px rgba(245,158,11,0.6);">
+        <div class="w-8 h-8 bg-black/10 rounded-xl flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-bell animate-bounce text-sm"></i>
+        </div>
+        <span id="popup-text" class="text-sm leading-snug"></span>
     </div>
 
+    <!-- ══ ADMIN TICKER BAR ══ -->
     <div id="admin-notif-bar" class="hidden fixed top-0 left-0 p-1 w-full bg-yellow-500 text-black z-[100] overflow-hidden font-bold text-xs">
         <div id="new-user-ticker" class="admin-ticker">جاري مراقبة المسجلين الجدد...</div>
     </div>
 
+    <!-- ══════════════════════════════════════ -->
+    <!--              LOGIN PAGE               -->
+    <!-- ══════════════════════════════════════ -->
     <div id="login-page" class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-        <div class="w-28 h-28 bg-yellow-500 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 shadow-2xl animate-pulse overflow-hidden">
-            <img src="https://i.postimg.cc/5ydqg4PP/20260328-213632.png" class="w-full h-full object-cover" alt="Logo">
+        <!-- Background Decoration -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,0.06) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);"></div>
         </div>
-        <h1 class="text-4xl font-black text-yellow-500 uppercase tracking-tighter mb-10">NACIROX</h1>
-        <button id="btn-login" class="flex items-center gap-4 bg-white text-black px-10 py-4 rounded-2xl font-black hover:scale-105 transition shadow-2xl">
-            <img src="https://www.google.com/favicon.ico" class="w-6" alt="google">
-            تسجيل الدخول بالجمايل
-        </button>
+
+        <div class="relative fade-in">
+            <div class="login-logo animate-pulse">
+                <img src="https://i.postimg.cc/5ydqg4PP/20260328-213632.png" class="w-full h-full object-cover" alt="Logo">
+            </div>
+            <h1 class="text-5xl font-black text-yellow-500 uppercase tracking-tighter mb-2">NACIROX</h1>
+            <p class="text-gray-500 text-sm mb-10 tracking-widest uppercase">Premium Rewards System</p>
+            <button id="btn-login" class="google-btn mx-auto">
+                <img src="https://www.google.com/favicon.ico" class="w-5 h-5" alt="google">
+                تسجيل الدخول بالجمايل
+            </button>
+            <p class="text-gray-700 text-xs mt-6">بالدخول فأنت توافق على شروط الخدمة</p>
+        </div>
     </div>
 
+    <!-- ══════════════════════════════════════ -->
+    <!--            DASHBOARD PAGE             -->
+    <!-- ══════════════════════════════════════ -->
     <div id="dashboard-page" class="hidden min-h-screen flex flex-col">
-        <nav class="bg-gray-950/80 border-b border-gray-800/50 p-4 sticky top-0 z-50 backdrop-blur-xl flex justify-between items-center">
+
+        <!-- ── TOP NAV ── -->
+        <nav class="nav-bar p-4 sticky top-0 z-50 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <button id="open-sidebar" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-900 border border-gray-800 text-gray-400">
-                    <i class="fas fa-bars-staggered text-xl"></i>
+                <button id="open-sidebar" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:border-white/20 transition-all">
+                    <i class="fas fa-bars-staggered text-lg"></i>
                 </button>
-                <button id="open-notifs" class="relative w-10 h-10 flex items-center justify-center rounded-xl bg-gray-900 border border-gray-800 text-yellow-500">
-                    <i class="fas fa-bell text-lg"></i>
+                <button id="open-notifs" class="relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-yellow-500 hover:bg-yellow-500/10 hover:border-yellow-500/30 transition-all">
+                    <i class="fas fa-bell text-base"></i>
                     <div id="notif-dot" class="hidden notif-badge"></div>
                 </button>
             </div>
-            <div class="flex items-center gap-3 bg-gradient-to-b from-gray-800 to-gray-900 border border-yellow-500/20 px-6 py-2 rounded-2xl shadow-xl">
-                <span id="points-count" class="text-yellow-500 font-black text-2xl tracking-tighter">0</span>
-                <i id="gem-icon-main" class="fas fa-gem text-yellow-500 text-sm"></i>
+
+            <!-- Points Counter -->
+            <div class="points-pill flex items-center gap-2 px-5 py-2 rounded-2xl">
+                <i id="gem-icon-main" class="fas fa-gem text-yellow-500 text-xs gem-glow"></i>
+                <span id="points-count" class="text-yellow-500 font-black text-xl tracking-tighter">0</span>
             </div>
+
+            <!-- Profile Photo -->
             <button id="open-profile" class="relative group">
-                <img id="user-display-photo" src="" class="w-12 h-12 rounded-2xl border-2 border-gray-800 group-hover:border-yellow-500 transition-all object-cover">
+                <img id="user-display-photo" src="" class="w-11 h-11 rounded-2xl border-2 border-white/10 group-hover:border-yellow-500/70 transition-all object-cover shadow-lg">
+                <div class="absolute inset-0 rounded-2xl group-hover:bg-yellow-500/10 transition-all"></div>
             </button>
         </nav>
 
-        <main class="flex-1 p-6 max-w-xl mx-auto w-full">
-            <h3 class="text-xl font-black mb-6 flex items-center gap-2">
-                <i class="fas fa-tasks text-yellow-500"></i> المهام المتاحة
-            </h3>
-            <div id="tasks-list" class="space-y-4"></div>
+        <!-- ── MAIN CONTENT ── -->
+        <main class="flex-1 p-5 max-w-xl mx-auto w-full">
 
-            <div id="admin-panel" class="hidden mt-12 border-t border-gray-800 pt-10 pb-20">
-                <h3 class="text-2xl font-black text-yellow-500 mb-6 uppercase italic text-center">Admin Panel</h3>
-                <div class="grid grid-cols-2 gap-4 mb-8 text-center text-xs">
-                    <div class="bg-gray-900 p-5 rounded-3xl border border-gray-800">
-                        <p class="text-gray-500">المستخدمين</p>
-                        <p id="total-users-count" class="text-2xl font-black">0</p>
+            <!-- Tasks Section Header -->
+            <div class="section-header">
+                <div class="w-8 h-8 bg-yellow-500/15 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-tasks text-yellow-500 text-xs"></i>
+                </div>
+                المهام المتاحة
+            </div>
+
+            <div id="tasks-list" class="space-y-3"></div>
+
+            <!-- ── ADMIN PANEL ── -->
+            <div id="admin-panel" class="hidden mt-12 border-t border-white/5 pt-10 pb-20">
+                <div class="text-center mb-8">
+                    <span class="text-xs font-bold text-yellow-500 tracking-widest uppercase bg-yellow-500/10 px-4 py-1.5 rounded-full border border-yellow-500/20">Admin Panel</span>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="admin-stat-box">
+                        <p class="text-gray-500 text-[10px] uppercase tracking-widest mb-2">المستخدمين</p>
+                        <p id="total-users-count" class="text-3xl font-black text-white">0</p>
                     </div>
-                    <div class="bg-gray-900 p-5 rounded-3xl border border-gray-800">
-                        <p class="text-gray-500">نشط الآن</p>
-                        <p id="active-users-count" class="text-2xl font-black text-green-500">1</p>
+                    <div class="admin-stat-box">
+                        <p class="text-gray-500 text-[10px] uppercase tracking-widest mb-2">نشط الآن</p>
+                        <p id="active-users-count" class="text-3xl font-black text-green-400">1</p>
                     </div>
                 </div>
-                <div class="bg-gray-900 p-6 rounded-[2.5rem] border border-blue-500/20 mb-8 text-right">
-                    <h4 class="font-bold mb-4 text-sm text-blue-500 italic">سحب الجوائز المعلقة</h4>
+
+                <!-- Withdraw Requests -->
+                <div class="admin-section border border-blue-500/15">
+                    <h4 class="font-bold mb-4 text-xs text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fas fa-wallet text-blue-500"></i> سحب الجوائز المعلقة
+                    </h4>
                     <div id="admin-withdraw-list" class="space-y-3"></div>
                 </div>
-                <div class="bg-gray-900 p-6 rounded-[2.5rem] border border-orange-500/20 mb-8 text-right">
-                    <h4 class="font-bold mb-4 text-sm text-orange-500 italic">طلبات المهام المعلقة</h4>
+
+                <!-- Task Requests -->
+                <div class="admin-section border border-orange-500/15">
+                    <h4 class="font-bold mb-4 text-xs text-orange-400 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fas fa-clock text-orange-500"></i> طلبات المهام المعلقة
+                    </h4>
                     <div id="pending-tasks-list" class="space-y-3 text-[11px]"></div>
                 </div>
-                <div class="bg-gray-900 p-6 rounded-[2.5rem] border border-yellow-500/20 mb-8 text-xs">
-                    <h4 class="font-bold mb-4 text-sm text-yellow-500 uppercase">إضافة مهمة</h4>
-                    <input type="text" id="new-task-title" placeholder="عنوان المهمة" class="w-full bg-black border border-gray-800 p-4 rounded-2xl mb-3 outline-none">
-                    <textarea id="new-task-desc" placeholder="وصف المهمة للمستخدم" class="w-full bg-black border border-gray-800 p-4 rounded-2xl mb-3 outline-none h-20"></textarea>
+
+                <!-- Add Task Form -->
+                <div class="admin-section border border-yellow-500/15">
+                    <h4 class="font-bold mb-4 text-xs text-yellow-500 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fas fa-plus-circle text-yellow-500"></i> إضافة مهمة
+                    </h4>
+                    <input type="text" id="new-task-title" placeholder="عنوان المهمة" class="form-input mb-3">
+                    <textarea id="new-task-desc" placeholder="وصف المهمة للمستخدم" class="form-input mb-3 h-20 resize-none"></textarea>
                     
                     <div class="mb-3">
                         <input type="file" id="new-task-icon-file" accept="image/*" class="hidden">
-                        <label for="new-task-icon-file" class="w-full bg-gray-800 border border-dashed border-gray-600 p-4 rounded-2xl block text-center cursor-pointer hover:border-yellow-500">
-                            <i class="fas fa-image mb-2 text-gray-500"></i>
-                            <p id="icon-file-name" class="text-[10px] text-gray-400">اضغط لرفع أيقونة المهمة من هاتفك</p>
+                        <label for="new-task-icon-file" class="upload-zone block">
+                            <i class="fas fa-image text-gray-500 text-lg mb-1 block"></i>
+                            <p id="icon-file-name" class="text-[10px] text-gray-500">اضغط لرفع أيقونة المهمة من هاتفك</p>
                         </label>
                     </div>
 
-                    <input type="url" id="new-task-url" placeholder="رابط OGAds" class="w-full bg-black border border-gray-800 p-4 rounded-2xl mb-3 outline-none">
-                    <input type="number" id="new-task-points" placeholder="النقاط" class="w-full bg-black border border-gray-800 p-4 rounded-2xl mb-4 outline-none">
-                    <button id="add-task-confirm" class="w-full bg-yellow-500 text-black font-black py-4 rounded-2xl">نشر</button>
-                    <div id="admin-manage-tasks" class="mt-4 space-y-2 border-t border-gray-800 pt-4"></div>
+                    <input type="url" id="new-task-url" placeholder="رابط OGAds" class="form-input mb-3">
+                    <input type="number" id="new-task-points" placeholder="النقاط" class="form-input mb-4">
+                    <button id="add-task-confirm" class="btn-primary">نشر المهمة</button>
+                    <div id="admin-manage-tasks" class="mt-4 space-y-2 border-t border-white/5 pt-4"></div>
                 </div>
+
                 <div id="admin-user-list" class="space-y-3 max-h-80 overflow-y-auto"></div>
             </div>
         </main>
     </div>
 
+    <!-- ══════════════════════════════════════ -->
+    <!--         NOTIFICATIONS MODAL           -->
+    <!-- ══════════════════════════════════════ -->
     <div id="notifs-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 profile-overlay">
-        <div class="bg-gray-900 border border-gray-800 w-full max-sm rounded-[2.5rem] p-6 relative">
-            <button onclick="document.getElementById('notifs-modal').classList.add('hidden')" class="btn-close-custom"><i class="fas fa-times"></i></button>
-            <h3 class="text-xl font-black mb-4 text-yellow-500 italic text-center underline">Notifications</h3>
+        <div class="modal-card w-full max-w-sm rounded-[2.5rem] p-6 relative">
+            <button onclick="document.getElementById('notifs-modal').classList.add('hidden')" class="btn-close-custom"><i class="fas fa-times text-sm"></i></button>
+            <div class="text-center mb-6 pt-2">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-bell text-yellow-500 text-lg"></i>
+                </div>
+                <h3 class="text-lg font-black text-white">الإشعارات</h3>
+            </div>
             <div id="notifs-content" class="space-y-3 max-h-80 overflow-y-auto text-sm text-right"></div>
         </div>
     </div>
 
+    <!-- ══════════════════════════════════════ -->
+    <!--          TASK DETAIL MODAL            -->
+    <!-- ══════════════════════════════════════ -->
     <div id="task-detail-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-6 profile-overlay text-center">
-        <div class="bg-gray-900 border border-gray-800 w-full max-w-sm rounded-[2.5rem] p-8 relative">
+        <div class="modal-card w-full max-w-sm rounded-[2.5rem] p-8 relative">
+            <div class="w-14 h-14 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-yellow-500/20">
+                <i class="fas fa-bolt text-yellow-500 text-xl"></i>
+            </div>
             <h3 id="modal-task-title" class="text-xl font-black mb-2 text-yellow-500 uppercase"></h3>
-            <p id="modal-task-desc" class="text-gray-400 text-sm mb-8 leading-relaxed"></p>
-            <button id="modal-start-btn" class="w-full bg-white text-black font-black py-4 rounded-2xl mb-3">ابدأ المهمة</button>
+            <p id="modal-task-desc" class="text-gray-400 text-sm mb-6 leading-relaxed"></p>
+            
+            <button id="modal-start-btn" class="btn-primary mb-3">
+                <i class="fas fa-play ml-2"></i> ابدأ المهمة
+            </button>
             
             <div id="proof-upload-section" class="mb-4 hidden">
-                <p class="text-yellow-500 text-xs mb-2 font-bold text-right">أرفق صورة أو فيديو (10ث) يثبت الإتمام:</p>
+                <p class="text-yellow-500/80 text-xs mb-3 font-bold text-right flex items-center gap-1">
+                    <i class="fas fa-camera"></i> أرفق صورة أو فيديو (10ث) يثبت الإتمام:
+                </p>
                 <input type="file" id="task-proof-input" accept="image/*,video/*" class="hidden">
-                <label for="task-proof-input" class="cursor-pointer bg-gray-800 border border-dashed border-gray-600 p-4 rounded-xl block hover:border-yellow-500 transition">
-                    <i class="fas fa-cloud-upload-alt text-2xl mb-2 text-gray-400"></i>
+                <label for="task-proof-input" class="upload-zone block">
+                    <i class="fas fa-cloud-upload-alt text-2xl mb-2 text-gray-500 block"></i>
                     <p id="file-name-display" class="text-[10px] text-gray-500">اضغط لرفع الإثبات</p>
                 </label>
             </div>
 
-            <button id="modal-confirm-btn" class="w-full bg-yellow-500 text-black font-black py-4 rounded-2xl">تأكيد الإتمام</button>
-            <button onclick="document.getElementById('task-detail-modal').classList.add('hidden')" class="mt-4 text-gray-600 text-xs text-right">إغلاق</button>
+            <button id="modal-confirm-btn" class="btn-primary mb-3">
+                <i class="fas fa-check ml-2"></i> تأكيد الإتمام
+            </button>
+            <button onclick="document.getElementById('task-detail-modal').classList.add('hidden')" class="text-gray-600 text-xs hover:text-gray-400 transition-colors">إغلاق</button>
         </div>
     </div>
 
+    <!-- ══════════════════════════════════════ -->
+    <!--          USER PROFILE MODAL           -->
+    <!-- ══════════════════════════════════════ -->
     <div id="user-profile-modal" class="hidden fixed inset-0 z-[160] flex items-center justify-center p-4 profile-overlay text-center">
-        <div class="bg-gray-950 border border-gray-800 w-full max-w-sm rounded-[3rem] p-8 relative shadow-2xl">
-            <button onclick="document.getElementById('user-profile-modal').classList.add('hidden')" class="btn-close-custom"><i class="fas fa-times"></i></button>
-            <div class="relative w-28 h-28 mx-auto mb-6">
-                <img id="modal-profile-img" src="" class="w-full h-full rounded-3xl border-4 border-yellow-500 object-cover shadow-2xl">
-                <label for="change-photo-input" class="absolute -bottom-2 -right-2 w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center text-black cursor-pointer border-4 border-gray-950 hover:scale-110 transition">
-                    <i class="fas fa-camera text-sm"></i>
+        <div class="modal-card w-full max-w-sm rounded-[3rem] p-8 relative">
+            <button onclick="document.getElementById('user-profile-modal').classList.add('hidden')" class="btn-close-custom"><i class="fas fa-times text-sm"></i></button>
+            
+            <!-- Avatar -->
+            <div class="relative w-28 h-28 mx-auto mb-5">
+                <img id="modal-profile-img" src="" class="w-full h-full rounded-3xl border-2 border-yellow-500/40 object-cover shadow-2xl">
+                <div class="absolute inset-0 rounded-3xl" style="box-shadow: 0 0 30px -5px rgba(245,158,11,0.3);"></div>
+                <label for="change-photo-input" class="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl flex items-center justify-center text-black cursor-pointer border-4 border-gray-950 hover:scale-110 transition shadow-lg">
+                    <i class="fas fa-camera text-xs"></i>
                 </label>
                 <input type="file" id="change-photo-input" accept="image/*" class="hidden">
             </div>
+
             <h3 id="modal-user-name" class="text-xl font-black text-white mb-1">...</h3>
-            <p id="modal-user-email" class="text-gray-500 text-xs mb-8 italic">...</p>
-            <div class="bg-gray-900/50 rounded-2xl p-4 border border-gray-800 mb-6 text-center">
-                <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1 text-right">رصيدك الحالي</p>
+            <p id="modal-user-email" class="text-gray-500 text-xs mb-6 italic">...</p>
+
+            <!-- Balance Card -->
+            <div class="profile-stat mb-6">
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 text-right">رصيدك الحالي</p>
                 <div class="flex items-center justify-center gap-2">
-                    <span id="modal-user-points" class="text-2xl font-black text-yellow-500">0</span>
-                    <i class="fas fa-gem text-yellow-500 text-sm"></i>
+                    <i class="fas fa-gem text-yellow-500"></i>
+                    <span id="modal-user-points" class="text-3xl font-black text-yellow-500">0</span>
+                    <span class="text-gray-500 text-sm">PT</span>
                 </div>
             </div>
-            <button onclick="document.getElementById('user-profile-modal').classList.add('hidden')" class="w-full py-4 bg-gray-800 text-white rounded-2xl font-bold text-sm">إغلاق</button>
+
+            <button onclick="document.getElementById('user-profile-modal').classList.add('hidden')" class="btn-secondary">إغلاق</button>
         </div>
     </div>
 
+    <!-- ══════════════════════════════════════ -->
+    <!--          STATIC PAGES MODAL           -->
+    <!-- ══════════════════════════════════════ -->
     <div id="static-pages-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4 profile-overlay text-right">
-        <div class="bg-gray-950 border border-gray-800 w-full max-xl rounded-[2.5rem] p-8 relative max-h-[85vh] overflow-y-auto text-right">
-            <button onclick="document.getElementById('static-pages-modal').classList.add('hidden')" class="btn-close-custom"><i class="fas fa-times"></i></button>
-            <h2 id="static-title" class="text-2xl font-black text-yellow-500 mb-6 text-right italic underline uppercase"></h2>
+        <div class="modal-card w-full max-w-xl rounded-[2.5rem] p-8 relative max-h-[85vh] overflow-y-auto">
+            <button onclick="document.getElementById('static-pages-modal').classList.add('hidden')" class="btn-close-custom"><i class="fas fa-times text-sm"></i></button>
+            <h2 id="static-title" class="text-2xl font-black text-yellow-500 mb-6 text-right uppercase tracking-wide"></h2>
             <div id="static-content" class="text-gray-300 leading-relaxed text-right text-sm space-y-4 font-medium"></div>
         </div>
     </div>
 
-    <div id="sidebar" class="sidebar fixed top-0 right-0 h-full w-80 bg-gray-950 border-l border-gray-800 shadow-2xl transform translate-x-full p-8 text-center overflow-y-auto">
-        <h3 class="text-2xl font-black text-yellow-500 mb-10 italic underline">القائمة""</h3>
-        <div id="open-withdraw-btn" class="bg-gray-900 p-5 rounded-3xl border border-gray-800 mb-6 flex items-center gap-4 cursor-pointer">
-            <div class="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center text-black"><i class="fas fa-wallet"></i></div>
-            <div class="text-right"><h4 class="font-bold text-sm text-white">مركز السحب</h4></div>
+    <!-- ══════════════════════════════════════ -->
+    <!--              SIDEBAR                  -->
+    <!-- ══════════════════════════════════════ -->
+    <div id="sidebar" class="sidebar fixed top-0 right-0 h-full w-80 shadow-2xl transform translate-x-full p-6 overflow-y-auto" style="background: linear-gradient(180deg, #0a0f1e 0%, #06090f 100%); border-left: 1px solid rgba(245,158,11,0.1);">
+        
+        <!-- Sidebar Header -->
+        <div class="text-center mb-8 pt-4">
+            <div class="w-12 h-12 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-yellow-500/20">
+                <i class="fas fa-gem text-yellow-500"></i>
+            </div>
+            <h3 class="text-xl font-black text-white">القائمة""</h3>
         </div>
-        <div id="open-referral-btn" class="bg-gray-900 p-5 rounded-3xl border border-gray-800 mb-6 flex items-center gap-4 cursor-pointer text-right">
-            <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white"><i class="fas fa-users"></i></div>
-            <div><h4 class="font-bold text-sm text-white text-right">نظام الإحالة</h4></div>
-        </div>
-        <div class="mt-4 space-y-1 border-t border-gray-800 pt-4 text-right">
-            <button onclick="window.showStaticPage('privacy')" class="block w-full text-right text-gray-500 hover:text-yellow-500 text-[11px] py-2 transition"><i class="fas fa-user-shield ml-2"></i> سياسة الخصوصية</button>
-            <button onclick="window.showStaticPage('terms')" class="block w-full text-right text-gray-500 hover:text-yellow-500 text-[11px] py-2 transition"><i class="fas fa-file-contract ml-2"></i> شروط الخدمة</button>
-            <button onclick="window.showStaticPage('about')" class="block w-full text-right text-gray-500 hover:text-yellow-500 text-[11px] py-2 transition"><i class="fas fa-info-circle ml-2"></i> من نحن</button>
-            <button onclick="window.showStaticPage('contact')" class="block w-full text-right text-gray-500 hover:text-yellow-500 text-[11px] py-2 transition"><i class="fas fa-envelope ml-2"></i> اتصل بنا</button>
-        </div>
-        <div class="mt-8 text-right border-t border-gray-800 pt-6">
-            <h4 class="text-yellow-500 font-black text-xs mb-4 uppercase tracking-widest text-right"><i class="fas fa-history ml-2"></i>سجل السحب</h4>
-            <div id="user-withdraw-history" class="space-y-3">
-                <p class="text-gray-600 text-[10px] text-center">لا توجد سحوبات بعد</p>
+
+        <!-- Navigation Items -->
+        <div id="open-withdraw-btn" class="sidebar-item">
+            <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl flex items-center justify-center text-black flex-shrink-0 shadow-lg">
+                <i class="fas fa-wallet text-sm"></i>
+            </div>
+            <div class="text-right">
+                <h4 class="font-bold text-sm text-white">مركز السحب</h4>
+                <p class="text-[10px] text-gray-500">استبدل نقاطك بجوائز</p>
             </div>
         </div>
-        <button id="btn-logout" class="w-full p-4 bg-red-500/10 text-red-500 rounded-2xl font-bold mb-4 mt-10">خروج</button>
-        <button onclick="window.autoCloseSidebar()" class="btn-close-custom"><i class="fas fa-times"></i></button>
+
+        <div id="open-referral-btn" class="sidebar-item text-right">
+            <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-lg">
+                <i class="fas fa-users text-sm"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm text-white text-right">نظام الإحالة</h4>
+                <p class="text-[10px] text-gray-500 text-right">ادع أصدقاءك واكسب</p>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div class="mt-2 space-y-1 border-t border-white/5 pt-4 text-right">
+            <button onclick="window.showStaticPage('privacy')" class="block w-full text-right text-gray-500 hover:text-yellow-500 text-xs py-2.5 px-3 rounded-xl hover:bg-yellow-500/5 transition-all"><i class="fas fa-user-shield ml-2"></i> سياسة الخصوصية</button>
+            <button onclick="window.showStaticPage('terms')" class="block w-full text-right text-gray-500 hover:text-yellow-500 text-xs py-2.5 px-3 rounded-xl hover:bg-yellow-500/5 transition-all"><i class="fas fa-file-contract ml-2"></i> شروط الخدمة</button>
+            <button onclick="window.showStaticPage('about')" class="block w-full text-right text-gray-500 hover:text-yellow-500 text-xs py-2.5 px-3 rounded-xl hover:bg-yellow-500/5 transition-all"><i class="fas fa-info-circle ml-2"></i> من نحن</button>
+            <button onclick="window.showStaticPage('contact')" class="block w-full text-right text-gray-500 hover:text-yellow-500 text-xs py-2.5 px-3 rounded-xl hover:bg-yellow-500/5 transition-all"><i class="fas fa-envelope ml-2"></i> اتصل بنا</button>
+        </div>
+
+        <!-- Withdraw History -->
+        <div class="mt-6 text-right border-t border-white/5 pt-5">
+            <h4 class="text-yellow-500 font-black text-[10px] mb-4 uppercase tracking-widest flex items-center gap-2">
+                <i class="fas fa-history"></i>سجل السحب
+            </h4>
+            <div id="user-withdraw-history" class="space-y-2">
+                <p class="text-gray-600 text-[10px] text-center py-4">لا توجد سحوبات بعد</p>
+            </div>
+        </div>
+
+        <!-- Logout -->
+        <button id="btn-logout" class="w-full p-3.5 bg-red-500/8 hover:bg-red-500/15 text-red-500 rounded-2xl font-bold mt-8 mb-4 border border-red-500/15 hover:border-red-500/30 transition-all text-sm">
+            <i class="fas fa-sign-out-alt ml-2"></i> خروج
+        </button>
+
+        <button onclick="window.autoCloseSidebar()" class="btn-close-custom"><i class="fas fa-times text-sm"></i></button>
     </div>
 
+    <!-- ══════════════════════════════════════ -->
+    <!--           REFERRAL MODAL              -->
+    <!-- ══════════════════════════════════════ -->
     <div id="referral-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-6 profile-overlay text-center">
-        <div class="bg-white border border-gray-200 w-full max-sm rounded-[2.5rem] p-8 relative text-gray-900 text-center">
-            <button onclick="document.getElementById('referral-modal').classList.add('hidden')" class="btn-close-custom"><i class="fas fa-times"></i></button>
-            <p class="font-bold mb-4 text-right text-gray-900">كود الإحالة الخاص بك</p>
-            <div class="bg-gray-200 py-3 rounded-full font-black text-xl mb-4 text-blue-600 font-mono"><span id="my-referral-code-display">...</span></div>
-            <button id="copy-ref-btn" class="w-full bg-teal-600 text-white py-3 rounded-full font-bold mb-6">نسخ ومشاركة الكود</button>
+        <div class="w-full max-w-sm rounded-[2.5rem] p-8 relative text-gray-900 text-center" style="background: white; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 40px 80px -20px rgba(0,0,0,0.4);">
+            <button onclick="document.getElementById('referral-modal').classList.add('hidden')" class="btn-close-custom"><i class="fas fa-times text-sm"></i></button>
+            
+            <div class="w-12 h-12 bg-teal-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-gift text-teal-600 text-lg"></i>
+            </div>
+            <p class="font-bold mb-4 text-right text-gray-800 text-sm">كود الإحالة الخاص بك</p>
+            
+            <div class="referral-code-box"><span id="my-referral-code-display">...</span></div>
+            
+            <button id="copy-ref-btn" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3.5 rounded-2xl font-bold mb-6 hover:opacity-90 transition shadow-lg">
+                <i class="fas fa-copy ml-2"></i> نسخ ومشاركة الكود
+            </button>
+            
             <div id="referral-input-container">
-                <input type="text" id="ref-input-field" placeholder="أدخل كود صديقك" class="w-full bg-gray-200 rounded-full py-3 px-6 text-center font-bold mb-4 outline-none uppercase font-mono">
-                <button id="confirm-ref-btn" class="w-full bg-teal-600 text-white py-3 rounded-full font-bold">تأكيد</button>
+                <input type="text" id="ref-input-field" placeholder="أدخل كود صديقك" class="w-full bg-gray-100 border border-gray-200 rounded-2xl py-3 px-6 text-center font-bold mb-3 outline-none uppercase font-mono text-sm focus:border-teal-400 focus:bg-teal-50 transition">
+                <button id="confirm-ref-btn" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3.5 rounded-2xl font-bold hover:opacity-90 transition shadow-lg">تأكيد</button>
             </div>
         </div>
     </div>
 
+    <!-- ══════════════════════════════════════ -->
+    <!--           WITHDRAW MODAL              -->
+    <!-- ══════════════════════════════════════ -->
     <div id="withdraw-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4 profile-overlay text-center">
-        <div class="bg-gray-950 border border-gray-800 w-full max-w-lg rounded-[3rem] p-6 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="document.getElementById('withdraw-modal').classList.add('hidden')" class="btn-close-custom"><i class="fas fa-times"></i></button>
-            <h2 class="text-2xl font-black text-yellow-500 mb-8 text-center italic uppercase tracking-tighter">مركز السحب</h2>
-            <div id="prizes-grid" class="grid grid-cols-2 gap-4 text-center">
+        <div class="modal-card w-full max-w-lg rounded-[3rem] p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="document.getElementById('withdraw-modal').classList.add('hidden')" class="btn-close-custom"><i class="fas fa-times text-sm"></i></button>
+            
+            <div class="text-center mb-6 pt-2">
+                <div class="w-14 h-14 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-yellow-500/20">
+                    <i class="fas fa-wallet text-yellow-500 text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-black text-yellow-500 uppercase tracking-tighter">مركز السحب</h2>
+                <p class="text-gray-500 text-xs mt-1">استبدل نقاطك بجوائز حقيقية</p>
+            </div>
+
+            <div id="prizes-grid" class="grid grid-cols-2 gap-3 text-center">
                 <div class="prize-card">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg" class="prize-img" alt="Recharge">
                     <h4 class="text-[11px] font-bold mb-2 text-center text-white"> Recharge 5 DH</h4>
-                    <button onclick="window.requestWithdraw('Recharge Orange', 350, 'رقم الهاتف + (*) ')" class="w-full bg-yellow-500 text-black py-2 rounded-xl text-[10px] font-black">350 PT</button>
+                    <button onclick="window.requestWithdraw('Recharge Orange', 350, 'رقم الهاتف + (*) ')" class="w-full bg-gradient-to-r from-yellow-500 to-amber-500 text-black py-2 rounded-xl text-[10px] font-black hover:opacity-90 transition">350 PT</button>
                 </div>
                 <div class="prize-card">
                     <img src="https://media.licdn.com/dms/image/v2/D560BAQGLDjXS_2M1ow/company-logo_200_200/B56ZnjTc41JwAI-/0/1760455151768/inwi_logo?v=beta" class="prize-img" alt="Recharge">
                     <h4 class="text-[11px] font-bold mb-2 text-center text-white">Recharge 5 Dh</h4>
-                    <button onclick="window.requestWithdraw('Recharge Inwi', 350, 'رقم الهاتف + (*) ')" class="w-full bg-yellow-500 text-black py-2 rounded-xl text-[10px] font-black">350 PT</button>
+                    <button onclick="window.requestWithdraw('Recharge Inwi', 350, 'رقم الهاتف + (*) ')" class="w-full bg-gradient-to-r from-yellow-500 to-amber-500 text-black py-2 rounded-xl text-[10px] font-black hover:opacity-90 transition">350 PT</button>
                 </div>
                 <div class="prize-card">
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZBuCXI0DbUP3IXt_iB0wjeY81-dJRlQpCpgwar7xGUw&s=10" class="prize-img" alt="Recharge">
                     <h4 class="text-[11px] font-bold mb-2 text-center text-white">Recharge 5 Dh</h4>
-                    <button onclick="window.requestWithdraw('Recharge Maroc telecom ', 350, 'رقم الهاتف + (*) ')" class="w-full bg-yellow-500 text-black py-2 rounded-xl text-[10px] font-black">350 PT</button>
+                    <button onclick="window.requestWithdraw('Recharge Maroc telecom ', 350, 'رقم الهاتف + (*) ')" class="w-full bg-gradient-to-r from-yellow-500 to-amber-500 text-black py-2 rounded-xl text-[10px] font-black hover:opacity-90 transition">350 PT</button>
                 </div>
                 <div class="prize-card">
                     <img src="https://www.cihbank.ma/100ansdhistoire/img/logo2014-big.jpg" class="prize-img" alt="Bank">
                     <h4 class="text-[11px] font-bold mb-2 text-center text-white"> CIH BANK 10 DH</h4>
-                    <button onclick="window.requestWithdraw('Cih bank', 700, 'الريب + الإسم')" class="w-full bg-yellow-500 text-black py-2 rounded-xl text-[10px] font-black">700 PT</button>
+                    <button onclick="window.requestWithdraw('Cih bank', 700, 'الريب + الإسم')" class="w-full bg-gradient-to-r from-yellow-500 to-amber-500 text-black py-2 rounded-xl text-[10px] font-black hover:opacity-90 transition">700 PT</button>
                 </div>
                 <div class="prize-card">
                     <img src="https://www.casablanca-bourse.com/_next/image?url=https%3A%2F%2Fmedia.casablanca-bourse.com%2Fsites%2Fdefault%2Ffiles%2F2025-11%2Fcashplus_logo_251120_105611.pdf_.png&w=1920" class="prize-img" alt="CashPlus">
                     <h4 class="text-[11px] font-bold mb-2 text-center text-white"> Cash Plus 10Dh</h4>
-                    <button onclick="window.requestWithdraw('Cash plus', 700, 'رقم الهاتف')" class="w-full bg-yellow-500 text-black py-2 rounded-xl text-[10px] font-black">700 PT</button>
+                    <button onclick="window.requestWithdraw('Cash plus', 700, 'رقم الهاتف')" class="w-full bg-gradient-to-r from-yellow-500 to-amber-500 text-black py-2 rounded-xl text-[10px] font-black hover:opacity-90 transition">700 PT</button>
                 </div>
                 <div class="prize-card">
                     <img src="https://thumbs.dreamstime.com/b/paypal-logo-icon-internet-based-digital-money-transfer-service-neumorphic-ui-ux-white-user-interface-neumorphism-style-222305149.jpg" class="prize-img" alt="PayPal">
                     <h4 class="text-[11px] font-bold mb-2 text-center text-white">1$ PayPal</h4>
-                    <button onclick="window.requestWithdraw('1$ Paypal', 750, 'البريد الإلكتروني')" class="w-full bg-yellow-500 text-black py-2 rounded-xl text-[10px] font-black">750 PT</button>
+                    <button onclick="window.requestWithdraw('1$ Paypal', 750, 'البريد الإلكتروني')" class="w-full bg-gradient-to-r from-yellow-500 to-amber-500 text-black py-2 rounded-xl text-[10px] font-black hover:opacity-90 transition">750 PT</button>
                 </div>
                 <div class="prize-card">
                     <img src="https://i.postimg.cc/BQjqhmyS/Top-Up-FF-Pakai-Pulsa-2-1-560x600.jpg" class="prize-img" alt="FF">
                     <h4 class="text-[11px] font-bold mb-2 text-center text-white">💎 100</h4>
-                    <button onclick="window.requestWithdraw('FF diamons', 700, 'الأيدي ')" class="w-full bg-yellow-500 text-black py-2 rounded-xl text-[10px] font-black">700 PT</button>
+                    <button onclick="window.requestWithdraw('FF diamons', 700, 'الأيدي ')" class="w-full bg-gradient-to-r from-yellow-500 to-amber-500 text-black py-2 rounded-xl text-[10px] font-black hover:opacity-90 transition">700 PT</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ══════════════════════════════════════ -->
+    <!--              JAVASCRIPT               -->
+    <!-- ══════════════════════════════════════ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -425,6 +883,12 @@
             } catch (err) { console.error(err); }
         };
 
+        window.deleteTask = async (taskId) => {
+            if(confirm("حذف المهمة؟")) {
+                try { await deleteDoc(doc(db, "tasks", taskId)); window.showTopNotif("تم حذف المهمة."); } catch(e) { console.error(e); }
+            }
+        };
+
         async function handleAuth(user) {
             const userRef = doc(db, "users", user.uid);
             let userSnap = await getDoc(userRef);
@@ -542,9 +1006,9 @@
                         if (hiddenTasks[tDoc.id]) return;
                         const t = tDoc.data();
                         const div = document.createElement('div');
-                        div.className = "bg-gray-900 border border-gray-800 p-5 rounded-[2rem] flex items-center justify-between cursor-pointer hover:border-yellow-500 transition mb-3 text-right";
-                        const iconHtml = t.icon ? `<img src="${t.icon}" class="w-10 h-10 rounded-2xl object-cover">` : `<div class="w-10 h-10 bg-yellow-500/10 rounded-2xl flex items-center justify-center text-yellow-500"><i class="fas fa-link"></i></div>`;
-                        div.innerHTML = `<div class="flex items-center gap-4 text-right text-right">${iconHtml}<div class="text-right"><h4 class="font-bold text-sm uppercase">${t.title}</h4><p class="text-[10px] text-gray-500">+${t.reward} PT</p></div></div><span class="bg-yellow-500 text-black font-black px-4 py-1 rounded-xl text-xs">+${t.reward}</span>`;
+                        div.className = "task-card flex items-center justify-between cursor-pointer mb-3 text-right";
+                        const iconHtml = t.icon ? `<img src="${t.icon}" class="w-10 h-10 rounded-2xl object-cover">` : `<div class="w-10 h-10 bg-yellow-500/10 rounded-2xl flex items-center justify-center text-yellow-500"><i class="fas fa-link text-sm"></i></div>`;
+                        div.innerHTML = `<div class="flex items-center gap-4 text-right text-right">${iconHtml}<div class="text-right"><h4 class="font-bold text-sm uppercase">${t.title}</h4><p class="text-[10px] text-gray-500">+${t.reward} PT</p></div></div><span class="reward-badge text-black font-black px-4 py-1.5 rounded-xl text-xs">+${t.reward}</span>`;
                         div.onclick = () => { currentActiveTask = { ...t, id: tDoc.id }; document.getElementById('modal-task-title').innerText = t.title; document.getElementById('modal-task-desc').innerText = t.description || "أكمل العرض للحصول على النقاط"; document.getElementById('proof-upload-section').classList.remove('hidden'); document.getElementById('file-name-display').innerText = "اضغط لرفع الصورة"; document.getElementById('task-proof-input').value = ""; document.getElementById('task-detail-modal').classList.remove('hidden'); };
                         container.appendChild(div);
                     });
@@ -563,7 +1027,7 @@
                     let statusText = 'قيد الانتظار';
                     if(d.status === 'success') { statusClass = 'text-green-500 font-bold'; statusText = 'تمت المطالبة بنجاح ✅'; }
                     if(d.status === 'rejected') { statusClass = 'text-red-500 font-bold'; statusText = `مرفوض: ${d.reason || ''} ❌`; }
-                    container.innerHTML += `<div class="bg-gray-900/50 p-3 rounded-xl border border-gray-800 text-right mb-2 text-right"><div class="flex justify-between items-center mb-1 text-right"><span class="text-white text-[11px] font-bold text-right text-right">${d.item}</span><span class="text-yellow-500 text-[10px]">${d.price} PT</span></div><p class="${statusClass} text-[9px] tracking-tighter text-right">${statusText}</p></div>`; 
+                    container.innerHTML += `<div class="withdraw-item text-right"><div class="flex justify-between items-center mb-1 text-right"><span class="text-white text-[11px] font-bold text-right text-right">${d.item}</span><span class="text-yellow-500 text-[10px]">${d.price} PT</span></div><p class="${statusClass} text-[9px] tracking-tighter text-right">${statusText}</p></div>`; 
                 });
             });
         }
@@ -578,7 +1042,7 @@
                     if (Date.now() - latestNotif.createdAt.toMillis() < 10000) window.showTopNotif(latestNotif.text);
                 }
                 const fullQ = query(collection(db, "notifications"), where("userId", "==", uid), orderBy("createdAt", "desc"));
-                getDocs(fullQ).then(s => { const content = document.getElementById('notifs-content'); content.innerHTML = s.empty ? "لا توجد إشعارات حالياً" : ""; s.forEach(d => { content.innerHTML += `<div class="bg-gray-800 p-4 rounded-2xl border-r-4 border-yellow-500 mb-2 text-right text-right text-right">${d.data().text}</div>`; }); });
+                getDocs(fullQ).then(s => { const content = document.getElementById('notifs-content'); content.innerHTML = s.empty ? "لا توجد إشعارات حالياً" : ""; s.forEach(d => { content.innerHTML += `<div class="notif-item text-right">${d.data().text}</div>`; }); });
             });
         }
 
@@ -591,7 +1055,7 @@
                 if (diff < 86400000) {
                     document.getElementById('referral-input-container').innerHTML = `<p class='text-orange-500 font-bold text-xs text-right'>لقد استخدمت كود إحالة اليوم. عد غداً ✅</p>`;
                 } else {
-                    document.getElementById('referral-input-container').innerHTML = `<input type="text" id="ref-input-field" placeholder="أدخل كود صديقك" class="w-full bg-gray-200 rounded-full py-3 px-6 text-center font-bold mb-4 outline-none uppercase font-mono"><button id="confirm-ref-btn-new" class="w-full bg-teal-600 text-white py-3 rounded-full font-bold">تأكيد</button>`;
+                    document.getElementById('referral-input-container').innerHTML = `<input type="text" id="ref-input-field" placeholder="أدخل كود صديقك" class="w-full bg-gray-100 border border-gray-200 rounded-2xl py-3 px-6 text-center font-bold mb-3 outline-none uppercase font-mono text-sm focus:border-teal-400 transition"><button id="confirm-ref-btn-new" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3.5 rounded-2xl font-bold hover:opacity-90 transition">تأكيد</button>`;
                     const btn = document.getElementById('confirm-ref-btn-new');
                     if(btn) btn.onclick = window.handleReferralAction;
                 }
